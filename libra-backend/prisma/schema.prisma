@@ -1,0 +1,145 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Book {
+  id           String              @id
+  title        String
+  description  String
+  authors      BookAuthorPivot[]
+  categories   BookCategoryPivot[]
+  publisher    Publisher           @relation(fields: [publisherId], references: [id])
+  publisherId  String
+  isbn         String
+  stock        Int
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  deletedAt    DateTime?
+  bookRequests BookRequestPivot[]
+}
+
+model Author {
+  id        String            @id
+  name      String
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  deletedAt DateTime?
+  books     BookAuthorPivot[]
+}
+
+model Category {
+  id        String              @id
+  code      String
+  name      String
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+  deletedAt DateTime?
+  books     BookCategoryPivot[]
+}
+
+model Publisher {
+  id        String    @id
+  code      String
+  name      String
+  link      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  books     Book[]
+}
+
+model User {
+  id                  String               @id
+  name                String
+  email               String
+  password            String
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  deletedAt           DateTime?
+  bookRequests        Request[]
+  verificationToken   VerificationToken?
+  forgetPasswordToken ForgetPasswordToken?
+}
+
+model VerificationToken {
+  id        String    @id
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String    @unique
+  code      String
+  expiredAt DateTime
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model ForgetPasswordToken {
+  id        String    @id
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String    @unique
+  code      String
+  expiredAt DateTime
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Request {
+  id        String             @id
+  user      User               @relation(fields: [userId], references: [id])
+  userId    String
+  books     BookRequestPivot[]
+  penalty   Penalty?
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  deletedAt DateTime?
+}
+
+model Penalty {
+  id        String    @id
+  request   Request   @relation(fields: [requestId], references: [id])
+  requestId String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model BookAuthorPivot {
+  id        String    @id
+  book      Book      @relation(fields: [bookId], references: [id], onDelete: NoAction)
+  bookId    String
+  author    Author    @relation(fields: [authorId], references: [id], onDelete: NoAction)
+  authorId  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model BookCategoryPivot {
+  id         String    @id
+  book       Book      @relation(fields: [bookId], references: [id], onDelete: NoAction)
+  bookId     String
+  category   Category  @relation(fields: [categoryId], references: [id], onDelete: NoAction)
+  categoryId String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+}
+
+model BookRequestPivot {
+  id        String    @id
+  request   Request   @relation(fields: [requestId], references: [id], onDelete: NoAction)
+  requestId String
+  book      Book      @relation(fields: [bookId], references: [id], onDelete: NoAction)
+  bookId    String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
