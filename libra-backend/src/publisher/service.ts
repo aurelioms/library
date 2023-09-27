@@ -27,8 +27,8 @@ type Deps = {
 }
 
 export type PublisherService = {
-    getAllPublisher: (params: GetAllPublisherParams) => Promise<void>
-    getPublisher: (params: GetPublisherParams) => Promise<void>
+    getAllPublisher: (params: GetAllPublisherParams) => Promise<Omit<Publisher, 'deletedAt'>[]>
+    getPublisher: (params: GetPublisherParams) => Promise<Omit<Publisher, 'deletedAt'> | null>
     createPublisher: (params: CreatePublisherParams) => Promise<void>
     updatePublisher: (params: UpdatePubsliherParams) => Promise<void>
     deletePublisher: (params: DeletePublisherParams) => Promise<void>
@@ -39,14 +39,15 @@ export const createPublisherService = (deps: Deps): PublisherService => {
 
     return {
         getAllPublisher: async () => {
-            await prisma.publisher.findMany()
+            return await prisma.publisher.findMany()
         },
         getPublisher: async ({ id }) => {
-            await prisma.publisher.findFirst({
+            return await prisma.publisher.findFirst({
                 select: {
                     id: true,
                     code: true,
                     name: true,
+                    link: true,
                     createdAt: true,
                     updatedAt: true,
                 },

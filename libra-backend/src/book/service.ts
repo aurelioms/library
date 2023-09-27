@@ -27,8 +27,8 @@ type Deps = {
 }
 
 export type BookService = {
-    getAllBook: (params: GetAllBookParams) => Promise<void>
-    getBook: (params: GetBookParams) => Promise<void>
+    getAllBook: (params: GetAllBookParams) => Promise<Omit<Book, 'deletedAt'>[]>
+    getBook: (params: GetBookParams) => Promise<Omit<Book, 'deletedAt'> | null>
     createBook: (params: CreateBookParams) => Promise<void>
     updateBook: (params: UpdatePubsliherParams) => Promise<void>
     deleteBook: (params: DeleteBookParams) => Promise<void>
@@ -39,10 +39,10 @@ export const createBookService = (deps: Deps): BookService => {
 
     return {
         getAllBook: async () => {
-            await prisma.book.findMany()
+            return await prisma.book.findMany()
         },
         getBook: async ({ id }) => {
-            await prisma.book.findFirst({
+            return await prisma.book.findFirst({
                 select: {
                     id: true,
                     title: true,

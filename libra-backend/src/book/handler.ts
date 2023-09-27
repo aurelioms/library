@@ -4,7 +4,6 @@ import { z } from 'zod'
 import { Handler } from './../handler'
 import { withValidation, zodLiteralUnion } from './../validation'
 import { BookService } from './service'
-import { prisma } from '@prisma/client'
 
 type GetAllBookHandlerDeps = {
     bookService: BookService
